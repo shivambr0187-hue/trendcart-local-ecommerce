@@ -7,6 +7,8 @@ The project is a front-end storefront demo with no build step, dependency instal
 ## Live preview
 
 - GitHub Pages: `https://shivambr0187-hue.github.io/trendcart-local-ecommerce/`
+- Storefront: `/index.html`
+- Admin panel: `/admin.html`
 - Optional custom domain: `shop.example.com`
 
 ## Features
@@ -26,6 +28,24 @@ The project is a front-end storefront demo with no build step, dependency instal
 - Favorites and mobile navigation
 - Newsletter and partner call-to-action interactions
 - Accessible modal, status and focus behavior
+
+## Admin dashboard
+
+Open `admin.html` to access the browser-only TrendCart admin demo.
+
+The admin panel includes:
+
+- Revenue, order, customer and product metrics
+- Sales and order-status overview
+- Recent and searchable orders
+- Order status management
+- Product add, edit and delete operations
+- Customer list generated from demo orders
+- Admin profile and store settings
+- CSV order-report export
+- Responsive desktop and mobile navigation
+
+The panel reads checkout orders from `trendcart-orders` and stores admin products under `trendcart-admin-products`. Profile and store settings are also saved in browser local storage. This demo does not include secure authentication or a server-side database.
 
 ## Demo checkout
 
@@ -49,6 +69,9 @@ python3 -m http.server 8000
 
 Open <http://localhost:8000>.
 
+- Storefront: <http://localhost:8000/index.html>
+- Admin panel: <http://localhost:8000/admin.html>
+
 You can also open `index.html` directly in a modern browser.
 
 ## Deploy to GitHub Pages
@@ -67,6 +90,9 @@ If using a custom domain, add it under **Settings → Pages → Custom domain** 
 index.html  — Marketplace page structure
 styles.css  — Responsive visual design and components
 app.js      — Cart, filtering, navigation and demo checkout behavior
+admin.html  — Admin dashboard structure
+admin.css   — Responsive admin dashboard design
+admin.js    — Dashboard, orders, products, customers and demo settings behavior
 README.md   — Project documentation
 ```
 
@@ -74,6 +100,7 @@ README.md   — Project documentation
 
 - Product and shop content is illustrative.
 - Checkout and payment processing are demo-only.
+- Admin access has no secure login or authentication in this demo.
 - Account, location, inventory and order-management features are not connected to a backend.
 - Demo orders remain in the current browser and may be cleared by browser storage settings.
 - Images and visual assets may require replacement with licensed production assets.
@@ -83,7 +110,7 @@ README.md   — Project documentation
 A production store would additionally require:
 
 - A backend and database
-- Secure authentication
+- Secure authentication and role-based admin access
 - Verified customer profiles and addresses
 - Real inventory management
 - Multi-vendor onboarding and dashboards

@@ -1,99 +1,57 @@
 # TrendCart — Local Ecommerce
 
-TrendCart is a polished, responsive neighborhood marketplace storefront for discovering fresh produce, bakery goods, pantry essentials and independent local shops.
+TrendCart is a responsive neighborhood marketplace storefront for discovering fresh produce, bakery goods, pantry essentials and independent local shops.
 
-The project is a front-end storefront demo with no build step, dependency installation or backend requirement.
+## Run the storefront demo
 
-## Live preview
-
-- GitHub Pages: `https://shivambr0187-hue.github.io/trendcart-local-ecommerce/`
-- Optional custom domain: `shop.example.com`
-
-## Features
-
-- Responsive marketplace landing page
-- Local shop and category discovery
-- Product search and category filters
-- Keyboard shortcut (`Ctrl/Cmd + K`) for search
-- Interactive shopping cart
-- Quantity controls and live subtotal
-- Free-delivery threshold calculation
-- Browser-based demo checkout
-- Customer delivery-details form
-- Cash-on-delivery and demo UPI options
-- Form validation and order confirmation
-- Demo order history saved in local storage
-- Favorites and mobile navigation
-- Newsletter and partner call-to-action interactions
-- Accessible modal, status and focus behavior
-
-## Demo checkout
-
-The checkout is a demonstration only:
-
-1. Add products to the cart.
-2. Open the cart and choose **Checkout**.
-3. Enter valid delivery details.
-4. Select a payment option.
-5. Place the demo order.
-
-The order is stored locally in the browser under `trendcart-orders`. It is not sent to a store, saved on a server or used to process real payments.
-
-## Run locally
-
-No package installation is required.
+The static storefront still works without a build step:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Open <http://localhost:8000>.
+Open <http://localhost:8000>. When using the Node.js server below, the storefront, database-backed product catalog, server-side checkout, and admin panel are served from one origin.
 
-You can also open `index.html` directly in a modern browser.
+## Node.js backend and admin panel
 
-## Deploy to GitHub Pages
+Requires Node.js 20 or newer. Copy `.env.example` to `.env`, set a unique admin email/password (at least 12 characters), and set a random `SESSION_SECRET` of 32+ characters. Then run:
 
-1. Open the repository **Settings**.
-2. Select **Pages** under **Code and automation**.
-3. Set **Source** to **Deploy from a branch**.
-4. Select branch `main` and folder `/ (root)`.
-5. Save and wait for the Pages deployment to finish.
-
-If using a custom domain, add it under **Settings → Pages → Custom domain** and configure its DNS records with the domain provider.
-
-## Project structure
-
-```text
-index.html  — Marketplace page structure
-styles.css  — Responsive visual design and components
-app.js      — Cart, filtering, navigation and demo checkout behavior
-README.md   — Project documentation
+```bash
+npm install
+npm start
 ```
 
-## Current limitations
+Open:
 
-- Product and shop content is illustrative.
-- Checkout and payment processing are demo-only.
-- Account, location, inventory and order-management features are not connected to a backend.
-- Demo orders remain in the current browser and may be cleared by browser storage settings.
-- Images and visual assets may require replacement with licensed production assets.
+- Storefront: <http://localhost:3000>
+- Admin panel: <http://localhost:3000/admin>
 
-## Production roadmap
+The first server start creates the admin account from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. The account is created only once; changing those environment values later does not reset its password. Use a securely managed environment file and never commit real credentials.
 
-A production store would additionally require:
+### Included functionality
 
-- A backend and database
-- Secure authentication
-- Verified customer profiles and addresses
-- Real inventory management
-- Multi-vendor onboarding and dashboards
-- Payment-gateway integration
-- Server-side order creation and verification
-- Webhooks and refund handling
-- Tax, shipping and delivery rules
-- Reviews and moderation
-- Analytics and SEO metadata
+- SQLite database for products, orders, order items, admins, and expiring admin sessions.
+- Password hashing with Node.js `scrypt`; signed, HTTP-only, same-site session cookies; rate-limited admin login.
+- Admin dashboard to add/edit/hide products and view/update order statuses.
+- Product API (`GET /api/products`) used to sync names/prices on the existing storefront.
+- Checkout submits customer details and cart quantities to `POST /api/orders`; the server looks up active catalog prices and computes delivery/total itself. Cash-on-delivery is supported. UPI is intentionally not accepted as a real payment method.
+- Delivery is ₹40 below a ₹499 subtotal and free at/above ₹499.
 
-## License
+**Important first setup:** Products need to exist in the admin catalog before checkout will accept them. Add catalog entries using the exact product names shown by the storefront buttons (for example, `Heirloom tomatoes`, `Slow-fermented sourdough`, `Wildflower raw honey`, and `Seasonal citrus box`) and set your real prices. The frontend disables products that are not in the active catalog. Product data/prices are server-authoritative; prices sent by the browser are ignored.
 
-See the repository license before using this demonstration for a commercial project.
+### Deployment notes
+
+GitHub Pages only serves static files and cannot run this Node.js server. Deploy the app to a Node-capable service (for example, a VPS or Node application host), configure `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, and `NODE_ENV=production`, and use HTTPS. Persist the `data/` directory or configure `DATABASE_FILE` on persistent storage; ephemeral container filesystems can lose the SQLite database. Set `TRUST_PROXY=1` only when deployed behind a trusted reverse proxy. Back up the database regularly. Payment gateway integration, email notifications, vendor accounts, and multi-vendor management are not included.
+
+## API overview
+
+- `GET /api/health` — health check
+- `GET /api/products` — active catalog
+- `POST /api/orders` — validate and create COD order using database prices
+- `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/me` — admin session
+- `/api/admin/products` — authenticated catalog management
+- `GET /api/admin/orders`, `PATCH /api/admin/orders/:id` — authenticated order management
+
+## Existing static preview
+
+GitHub Pages: <https://shivambr0187-hue.github.io/trendcart-local-ecommerce/>. It remains a static demo; API-backed checkout/admin features require the Node.js deployment.
